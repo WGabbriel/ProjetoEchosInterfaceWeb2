@@ -26,9 +26,6 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'appt1', 'templates', 'static'),
-]
 GDAL_LIBRARY_PATH = 'C:/Users/Usuário/Downloads/gdal-3.7.3'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/

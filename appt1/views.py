@@ -1,11 +1,5 @@
-from django.shortcuts import render
 from .models import   RGraficos
 import pymongo
-from django.shortcuts import render
-import plotly.graph_objects as go
-import matplotlib.pyplot as plt
-from io import BytesIO
-import base64
 import paho.mqtt.client as mqtt
 import json
 import threading
@@ -340,31 +334,8 @@ def get_dados_armazenados(request):
                     }
     
     return JsonResponse(DADOS_ARMAZENADOS)
-def cria_grafico(x, y, cor):
-    plt.figure(figsize=(5,3))
-    plt.plot(x, y, color=cor)
-    plt.ylim((min(y)-2, max(y)+2))
-    plt.tight_layout()
-
-    buffer = BytesIO()
-    plt.savefig(buffer, format='png')
-    buffer.seek(0)
-    img = base64.b64encode(buffer.getvalue()).decode()
-    buffer.close()
-
-    return img
-
-
-import requests
-from django.shortcuts import render
-
-
 def home(request):
-
-   
-
-    return render(request, 'estacao/home.html')
-# Create your views here.
+    return JsonResponse({"status": "ok"})
 
 def retornaGraficos(request):
 
@@ -395,12 +366,12 @@ def retornaGraficos(request):
             dados = None
     
     if not dados and retornaEstacao == True and retornaBoia == False:
-            return render(request, 'estacao/DataConfirmadaEst.html', {
+            return JsonResponse({
                 'DataInvalida': True,
                 'DataValida': False
             })
     elif not dados and retornaEstacao == False and retornaBoia == True:
-            return render(request, 'estacao/DataConfirmadaBoia.html', {
+            return JsonResponse({
                 'DataInvalida': True,
                 'DataValida': False
             })
@@ -450,19 +421,11 @@ def retornaGraficos(request):
 
         if not encontrou_dados or not t:
             
-            return render(request, 'estacao/DataConfirmadaEst.html', {
+            return JsonResponse({
                             'DataInvalida': True,
                             'DataValida': False
             })
             
-        img_t = cria_grafico(leitura, t, 'red')
-        img_u = cria_grafico(leitura, u, 'blue')
-        img_p = cria_grafico(leitura, p, 'purple')
-        img_gas = cria_grafico(leitura, gas, 'grey')
-        img_ar = cria_grafico(leitura, q_ar, 'orange')
-        img_luz = cria_grafico(leitura, luz, 'yellow')
-        img_rpm = cria_grafico(leitura, rpm, 'black')
-        img_vv = cria_grafico(leitura, v_vento, 'black')
         context = {
 
             # Última leitura
@@ -501,22 +464,25 @@ def retornaGraficos(request):
             'humMin': "{:.2f}".format(min(u)),
             'presMin': "{:.2f}".format(min(p)),
 
-            # Gráficos
-            'img_t': img_t,
-            'img_u': img_u,
-            'img_p': img_p,
-            'img_gas': img_gas,
-            'img_ar': img_ar,
-            'img_luz': img_luz,
-            'img_rpm': img_rpm,
-            'img_vv': img_vv,
+            # Séries
+            'series': {
+                'leitura': leitura,
+                't': t,
+                'u': u,
+                'p': p,
+                'gas': gas,
+                'q_ar': q_ar,
+                'luz': luz,
+                'rpm': rpm,
+                'v_vento': v_vento,
+            },
             'DataInvalida': False,
             'DataValida': True,
             'datacompleta': datacompleta,
             'datafinal': dataFinal
         }
 
-        return render(request, 'estacao/DataConfirmadaEst.html', context)
+        return JsonResponse(context)
     if retornaEstacao == False and retornaBoia == True:
           coletandoValores2 = False
           for chave, valor in dados.items():    
@@ -547,17 +513,11 @@ def retornaGraficos(request):
           
           if not encontrou_dados or not adc:
                        
-                        return render(request, 'estacao/DataConfirmadaBoia.html', {
+                        return JsonResponse({
                                         'DataInvalida': True,
                                         'DataValida': False
                         })
                     
-          img_adc = cria_grafico(leitura, adc, 'red')
-          img_ph = cria_grafico(leitura, ph, 'blue')
-          img_uv = cria_grafico(leitura, uv, 'purple')
-          img_tensao = cria_grafico(leitura, tens, 'grey')
-          img_turbidez = cria_grafico(leitura, turb, 'orange')
-                   
           context = {
             
                         # Última leitura
@@ -587,12 +547,15 @@ def retornaGraficos(request):
                         'turbidezMin':"{:.2f}".format(min(turb)),
                        
             
-                        # Gráficos
-                        'img_adc': img_adc,
-                        'img_ph': img_ph,
-                        'img_uv': img_uv,
-                        'img_tensao': img_tensao,
-                        'img_turbidez': img_turbidez,
+                        # Séries
+                        'series': {
+                            'leitura': leitura,
+                            'adc': adc,
+                            'ph': ph,
+                            'uv': uv,
+                            'tensao': tens,
+                            'turbidez': turb,
+                        },
                        
                         'DataInvalida': False,
                         'DataValida': True,
@@ -600,4 +563,4 @@ def retornaGraficos(request):
                         'datafinal': dataFinal
                     }
             
-          return render(request, 'estacao/DataConfirmadaBoia.html', context)
+          return JsonResponse(context)
