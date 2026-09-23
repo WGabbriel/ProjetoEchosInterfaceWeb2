@@ -1,0 +1,35 @@
+# Harness (OpenCode) - nao versionar
+AGENTS.md
+CONTEXT.md
+.opencode/
+instructions/
+
+# Secrets / env - nunca commitar (t1/settings.py:37 ainda tem SECRET_KEY hardcoded)
+.env
+.env.*
+*.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django - sem `static/` generico: appt1/templates/static/ e fonte (STATICFILES_DIRS em t1/settings.py:29)
+*.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# venv
+.venv/
+venv/
+ENV/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+*.swp
