@@ -5,3 +5,4 @@ plotly
 pytz
 requests
 pandas
+gunicorn
